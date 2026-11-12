@@ -92,4 +92,16 @@ function draw(){const el=document.getElementById('cart');if(!cart.length){el.tex
 function removeItem(i){cart.splice(i,1);draw()}
 function order(){if(!cart.length){alert('আগে পণ্য কার্টে যোগ করুন।');return}let n=document.getElementById('buyer').value.trim(),p=document.getElementById('phone').value.trim(),a=document.getElementById('address').value.trim();if(!n||!p||!a){alert('নাম, মোবাইল ও ঠিকানা পূরণ করুন।');return}if(!/^01[0-9]{9}$/.test(p)){alert('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।');return}let lines=cart.map(x=>`${x.name} | সাইজ ${x.size} | ${x.qty}টি | ৳${x.price*x.qty}`).join('\n');let total=cart.reduce((s,x)=>s+x.price*x.qty,0);let msg=`DealNexa BD Hoodie Order\nনাম: ${n}\nমোবাইল: ${p}\nঠিকানা: ${a}\nপেমেন্ট: ${document.getElementById('pay').value}\n\n${lines}\nমোট: ৳${total}`;window.open('https://wa.me/8801832763840?text='+encodeURIComponent(msg),'_blank')}
 draw();
-</script></body></html>
+</script><!-- Floating WhatsApp Button -->
+<a href="https://wa.me/8801832763840"
+   target="_blank"
+   rel="noopener"
+   style="position:fixed;bottom:20px;right:20px;
+   background:#25D366;color:#fff;
+   padding:14px 20px;border-radius:50px;
+   text-decoration:none;font-weight:bold;
+   z-index:9999;box-shadow:0 3px 10px #999;">
+   WhatsApp-এ যোগাযোগ করুন
+</a>
+</body>
+</html></body></html>
