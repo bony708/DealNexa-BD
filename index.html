@@ -96,7 +96,32 @@ const products=[{id:1,name:'Color Splash Hoodie – White & Maroon',price:900,st
 function add(id){const p=products.find(x=>x.id===id);const size=document.getElementById('size'+id).value;const found=cart.find(x=>x.id===id&&x.size===size);if(found){if(found.qty>=5){alert('এই ডিজাইনের সর্বোচ্চ স্টক ৫টি।');return}found.qty++}else cart.push({id:p.id,name:p.name,size,price:p.price,qty:1});draw()}
 function draw(){const el=document.getElementById('cart');if(!cart.length){el.textContent='কার্টে এখনো কোনো পণ্য নেই।';document.getElementById('total').textContent='মোট: ৳০';return}el.innerHTML=cart.map((x,i)=>`<div class="cartline"><span>${x.name} / ${x.size} × ${x.qty}</span><span>৳${x.price*x.qty} <button style="width:auto;margin:0;padding:4px 8px" onclick="removeItem(${i})">×</button></span></div>`).join('');document.getElementById('total').textContent='মোট: ৳'+cart.reduce((s,x)=>s+x.price*x.qty,0)}
 function removeItem(i){cart.splice(i,1);draw()}
-function order(){if(!cart.length){alert('আগে পণ্য কার্টে যোগ করুন।');return}let n=document.getElementById('buyer').value.trim(),p=document.getElementById('phone').value.trim(),a=document.getElementById('address').value.trim();if(!n||!p||!a){alert('নাম, মোবাইল ও ঠিকানা পূরণ করুন।');return}if(!/^01[0-9]{9}$/.test(p)){alert('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।');return}let lines=cart.map(x=>`${x.name} | সাইজ ${x.size} | ${x.qty}টি | ৳${x.price*x.qty}`).join('\n');let total=cart.reduce((s,x)=>s+x.price*x.qty,0);let msg=`DealNexa BD Hoodie Order\nনাম: ${n}\nমোবাইল: ${p}\nঠিকানা: ${a}\nপেমেন্ট: ${document.getElementById('pay').value}\n\n${lines}\nমোট: ৳${total}`;window.open('https://wa.me/8801832763840?text='+encodeURIComponent(msg),'_blank')}
+function order(){if(!cart.length){alert('আগে পণ্য কার্টে যোগ করুন।');return}
+let n=document.getElementById('buyer').value.trim();
+let p=document.getElementById('phone').value.trim();
+let a=document.getElementById('address').value.trim();
+if(!n||!p||!a){alert('নাম, মোবাইল ও ঠিকানা পূরণ করুন।');return}
+if(!/^01[0-9]{9}$/.test(p)){
+alert('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।');
+return;}
+let delivery=Number(document.getElementById('delivery').value);
+let lines=cart.map(x=>`${x.name} | সাইজ ${x.size} | ${x.qty}টি | ৳${x.price*x.qty}`).join('\n');
+let subtotal=cart.reduce((s,x)=>s+x.price*x.qty,0);
+let total=subtotal+delivery;
+let msg=`DealNexa BD Hoodie Order
+নাম: ${n}
+মোবাইল: ${p}
+ঠিকানা: ${a}
+পেমেন্ট: ${document.getElementById('pay').value}
+
+${lines}
+পণ্যের দাম: ৳${subtotal}
+ডেলিভারি চার্জ: ৳${delivery}
+সর্বমোট: ৳${total}`;
+
+window.open('https://wa.me/8801832763840?text='+encodeURIComponent(msg),'_blank');
+}
+
 draw();
 </script><!-- Floating WhatsApp Button -->
 <a href="https://wa.me/8801832763840"
@@ -110,4 +135,4 @@ draw();
    WhatsApp-এ যোগাযোগ করুন
 </a>
 </body>
-</html></body></html>
+</html>
