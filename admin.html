@@ -151,12 +151,13 @@ del.onclick=()=>removeProduct(item.id);
 div.append(img,info,edit,del);
 $("products").append(div);
 });
-if(snap.empty)$("products").textContent="No products found.";
+if($("msg")) $("msg").textContent="Product saved successfully!";
 }catch(e){
-$("products").textContent="Error: "+e.message;
+if($("msg")) $("msg").textContent="Error: "+e.message;
 }
 }
 window.saveProduct=async function(){
+ <p id="msg"></p> 
 const user=auth.currentUser;
 if(!user)return;
 const name=$("name").value.trim();
