@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealNexa BD Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f9;font-family:Arial,sans-serif;color:#222}
+header{background:#172554;color:white;padding:20px;text-align:center}
+main{max-width:650px;margin:20px auto;padding:15px}
+.card{background:white;padding:18px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px #ddd}
+input{width:100%;padding:13px;margin:7px 0;border:1px solid #ccc;border-radius:7px}
+button{padding:12px;border:0;border-radius:7px;background:#1d4ed8;color:white;margin:5px 2px;cursor:pointer}
+.danger{background:#dc2626}
+.green{background:#15803d}
+img{width:65px;height:65px;object-fit:cover;border-radius:7px}
+.product{display:flex;align-items:center;gap:10px;border-bottom:1px solid #ddd;padding:12px 0}
+.product-info{flex:1;min-width:0;overflow-wrap:anywhere}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>
+<h2>DealNexa BD</h2>
+<p>Admin Dashboard</p>
+</header>
+
+<main>
+<div class="card" id="loginBox">
+<h3>Admin Login</h3>
+<input id="email" type="email" placeholder="Admin Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="loginMsg"></p>
+</div>
+
+<div id="dashboard" class="hidden">
+<div class="card">
+<h3>Product Management</h3>
+<input id="pid" type="hidden">
+<input id="name" placeholder="Product Name">
+<input id="price" type="number" placeholder="Product Price">
+<input id="image" type="url" placeholder="Product Image URL">
+<button class="green" onclick="saveProduct()">Save Product</button>
+<button onclick="clearForm()">Clear</button>
+<button class="danger" onclick="logout()">Logout</button>
+<p id="msg"></p>
+</div>
+
+<div class="card">
+<h3>All Products</h3>
+<div id="products">Loading...</div>
+</div>
+</div>
+</main>
+
+<script type="module">
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
+import {
+getAuth, signInWithEmailAndPassword, signOut,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+import {
+getFirestore, collection, addDoc, getDocs,
+doc, updateDoc, deleteDoc
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+// নিজের Firebase config বসাবে
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "YOUR_SENDER_ID",
+appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+
+window.login = async function(){
+try{
+await signInWithEmailAndPassword(
+auth,$("email").value,$("password").value
+);
+$("loginMsg").textContent = "";
+}catch(e){
+$("loginMsg").textContent = "Login failed: "+e.message;
+}
+};
+
+window.logout = () => signOut(auth);
+
+onAuthStateChanged(auth,user=>{
+$("loginBox").classList.toggle("hidden",!!user);
+$("dashboard").classList.toggle("hidden",!user);
+if(user) loadProducts();
+});
+
+async function loadProducts(){
+$("products").textContent="Loading...";
+try{
+const snap=await getDocs(collection(db,"products"));
+$("products").innerHTML="";
+snap.forEach(item=>{
+const p=item.data();
+const div=document.createElement("div");
+div.className="product";
+
+const img=document.createElement("img");
+img.src=p.image || "";
+img.alt=p.name || "Product";
+img.onerror=()=>img.style.display="none";
+
+const info=document.createElement("div");
+info.className="product-info";
+const title=document.createElement("b");
+title.textContent=p.name || "Unnamed";
+const price=document.createElement("p");
+price.textContent="৳"+(p.price ?? 0);
+info.append(title,price);
+
+const edit=document.createElement("button");
+edit.textContent="Edit";
+edit.onclick=()=>editProduct(item.id,p);
+
+const del=document.createElement("button");
+del.textContent="Delete";
+del.className="danger";
+del.onclick=()=>removeProduct(item.id);
+
+div.append(img,info,edit,del);
+$("products").append(div);
+});
+if(snap.empty)$("products").textContent="No products found.";
+}catch(e){
+$("products").textContent="Error: "+e.message;
+}
+}
+
+window.saveProduct=async function(){
+const user=auth.currentUser;
+if(!user)return;
+
+const name=$("name").value.trim();
+const price=Number($("price").value);
+const image=$("image").value.trim();
+const pid=$("pid").value;
+
+if(!name || !$("price").value || price<0 || !image){
+alert("সব তথ্য সঠিকভাবে পূরণ করো");
+return;
+}
+
+try{
+const data={name,price,image};
+if(pid){
+await updateDoc(doc(db,"products",pid),data);
+}else{
+await addDoc(collection(db,"products"),data);
+}
+$("msg").textContent="Product saved successfully!";
+clearForm();
+await loadProducts();
+}catch(e){
+$("msg").textContent="Error: "+e.message;
+}
+};
+
+window.editProduct=(id,p)=>{
+$("pid").value=id;
+$("name").value=p.name || "";
+$("price").value=p.price ?? "";
+$("image").value=p.image || "";
+window.scrollTo(0,0);
+};
+
+window.removeProduct=async(id)=>{
+if(!confirm("এই Product ডিলিট করতে চাও?"))return;
+try{
+await deleteDoc(doc(db,"products",id));
+await loadProducts();
+}catch(e){
+alert("Delete failed: "+e.message);
+}
+};
+
+window.clearForm=()=>{
+$("pid").value="";
+$("name").value="";
+$("price").value="";
+$("image").value="";
+};
+</script>
+</body>
+</html>
