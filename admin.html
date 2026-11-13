@@ -37,22 +37,31 @@ img{width:65px;height:65px;object-fit:cover;border-radius:7px}
 <p id="loginMsg"></p>
 </div>
 
+
 <div id="dashboard" class="hidden">
 <div class="card">
 <h3>Product Management</h3>
+
 <input id="pid" type="hidden">
 <input id="name" placeholder="Product Name">
 <input id="price" type="number" placeholder="Product Price">
 <input id="image" type="url" placeholder="Product Image URL">
+
+<label>Product Size</label>
+<select id="size">
+<option value="">Select Size</option>
+<option value="S">S</option>
+<option value="M">M</option>
+<option value="L">L</option>
+<option value="XL">XL</option>
+<option value="XXL">XXL</option>
+</select>
+
 <button class="green" onclick="saveProduct()">Save Product</button>
 <button onclick="clearForm()">Clear</button>
 <button class="danger" onclick="logout()">Logout</button>
-<p id="msg"></p>
-</div>
 
-<div class="card">
-<h3>All Products</h3>
-<div id="products">Loading...</div>
+<p id="msg"></p>
 </div>
 </div>
 </main>
@@ -155,23 +164,27 @@ if(!user)return;
 const name=$("name").value.trim();
 const price=Number($("price").value);
 const image=$("image").value.trim();
+const size=$("size").value;
 const pid=$("pid").value;
 
-if(!name || !$("price").value || price<0 || !image){
+if(!name || !$("price").value || price<0 || !image || !size){
 alert("সব তথ্য সঠিকভাবে পূরণ করো");
 return;
 }
 
 try{
-const data={name,price,image};
+const data={name,price,image,size};
+
 if(pid){
 await updateDoc(doc(db,"products",pid),data);
 }else{
 await addDoc(collection(db,"products"),data);
 }
+
 $("msg").textContent="Product saved successfully!";
 clearForm();
 await loadProducts();
+
 }catch(e){
 $("msg").textContent="Error: "+e.message;
 }
@@ -195,12 +208,12 @@ alert("Delete failed: "+e.message);
 }
 };
 
+
 window.clearForm=()=>{
 $("pid").value="";
 $("name").value="";
 $("price").value="";
 $("image").value="";
+$("size").value="";
 };
-</script>
-</body>
-</html>
+
