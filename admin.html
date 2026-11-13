@@ -72,15 +72,16 @@ doc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 // নিজের Firebase config বসাবে
+  
 const firebaseConfig = {
-apiKey: "YOUR_API_KEY",
-authDomain: "YOUR_PROJECT.firebaseapp.com",
-projectId: "YOUR_PROJECT_ID",
-storageBucket: "YOUR_PROJECT.appspot.com",
-messagingSenderId: "YOUR_SENDER_ID",
-appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCetkVvPpOkDXTzrAe7TUuMkDJt45080u4",
+  authDomain: "dealnexa-bd.firebaseapp.com",
+  projectId: "dealnexa-bd",
+  storageBucket: "dealnexa-bd.firebasestorage.app",
+  messagingSenderId: "300073034500",
+  appId: "1:300073034500:web:c492db4ecab15d5993a651",
+  measurementId: "G-YQR9FCF5J9"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
