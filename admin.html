@@ -149,7 +149,13 @@ del.className="danger";
 del.onclick=()=>removeProduct(item.id);
 
 div.append(img,info,edit,del);
-$("products").append(div);
+  const productsEl = $("products");
+
+if(productsEl){
+  productsEl.append(div);
+}else{
+  throw new Error("products ID not found in HTML");
+}
 });
 if($("msg")) $("msg").textContent="Product saved successfully!";
 }catch(e){
