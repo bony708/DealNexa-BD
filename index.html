@@ -156,113 +156,108 @@ async function loadProducts() {
 let cart=[];
 
 function add(id){
-const p=products.find(x=>String(x.id)===String(id));
+  const p = products.find(x => String(x.id) === String(id));
 
-if(!p){
-alert('পণ্য পাওয়া যায়নি।');
-return;
+  if(!p){
+    alert('পণ্য পাওয়া যায়নি।');
+    return;
+  }
+
+  const sizeEl = document.getElementById('size'+id);
+
+  if(!sizeEl){
+    alert('সাইজ নির্বাচন পাওয়া যায়নি।');
+    return;
+  }
+
+  const size = sizeEl.value;
+
+  const found = cart.find(x =>
+    String(x.id) === String(id) && x.size === size
+  );
+
+  if(found){
+    if(found.qty >= 5){
+      alert('সর্বোচ্চ ৫টি অর্ডার করা যাবে।');
+      return;
+    }
+    found.qty++;
+  }else{
+    cart.push({
+      id:p.id,
+      name:p.name,
+      size:size,
+      price:Number(p.price),
+      qty:1
+    });
+  }
+
+  draw();
 }
-
-const sizeEl=document.getElementById('size'+id);
-if(!sizeEl){
-alert('সাইজ নির্বাচন পাওয়া যায়নি।');
-return;
-}
-
-const size=sizeEl.value;
-const found=cart.find(x=>String(x.id)===String(id)&&x.size===size);
-
-if(found){
-if(found.qty>=5){
-alert('এই ডিজাইনের সর্বোচ্চ স্টক ৫টি।');
-return;
-}
-found.qty++;
-}else{
-cart.push({
-id:p.id,
-name:p.name,
-size:size,
-price:Number(p.price),
-qty:1
-});
-}
-
-draw();
-}
-
 function draw(){
-const el=document.getElementById('cart');
+  const el = document.getElementById('cart');
+  const totalEl = document.getElementById('total');
 
-if(!cart.length){
-el.textContent='কার্টে এখনো কোনো পণ্য নেই।';
-document.getElementById('total').textContent='মোট: ৳০';
-return;
+  if(!el || !totalEl) return;
+
+  if(cart.length === 0){
+    el.innerHTML = 'কার্টে এখনো কোনো পণ্য নেই।';
+    totalEl.innerHTML = 'মোট: ৳০';
+    return;
+  }
+
+  let total = 0;
+
+  el.innerHTML = cart.map((item,index)=>{
+    const subtotal = item.price * item.qty;
+    total += subtotal;
+
+    return `
+      <div>
+        <b>${item.name}</b><br>
+        সাইজ: ${item.size}<br>
+        দাম: ৳${item.price}<br>
+        পরিমাণ: 
+        <button onclick="changeQty(${index},-1)">−</button>
+        ${item.qty}
+        <button onclick="changeQty(${index},1)">+</button>
+        <br>মোট: ৳${subtotal}
+        <button onclick="removeItem(${index})">বাদ দিন</button>
+      </div>
+    `;
+  }).join('');
+
+  totalEl.innerHTML = 'মোট: ৳' + total;
 }
 
-el.innerHTML=cart.map((x,i)=>`
-<div class="cartline">
-<span>${x.name} / ${x.size} × ${x.qty}</span>
-<span>৳${x.price*x.qty}
-<button style="width:auto;margin:0;padding:4px 8px" onclick="removeItem(${i})">×</button>
-</span>
-</div>`).join('');
+function changeQty(index,change){
+  if(!cart[index]) return;
 
-document.getElementById('total').textContent=
-'মোট: ৳'+cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const newQty = cart[index].qty + change;
+
+  if(newQty < 1){
+    removeItem(index);
+    return;
+  }
+
+  if(newQty > 5){
+    alert('সর্বোচ্চ ৫টি অর্ডার করা যাবে।');
+    return;
+  }
+
+  cart[index].qty = newQty;
+  draw();
 }
 
-function removeItem(i){
-cart.splice(i,1);
-draw();
+function removeItem(index){
+  cart.splice(index,1);
+  draw();
 }
 
-`${x.name} | সাইজ ${x.size} | ${x.qty}টি | ৳${x.price*x.qty}`
-).join('\n');
-
-let subtotal=cart.reduce((s,x)=>s+x.price*x.qty,0);
-let total=subtotal+delivery;
-
-let msg=`DealNexa BD Hoodie Order
-নাম: ${n}
-মোবাইল: ${p}
-ঠিকানা: ${a}
-পেমেন্ট: ${document.getElementById('pay').value}
-
-পণ্যসমূহ:
-${lines}
-
-পণ্যের মোট: ৳${subtotal}
-ডেলিভারি চার্জ: ৳${delivery}
-সর্বমোট: ৳${total}`;
-
-let url=`https://wa.me/8801832763840?text=${encodeURIComponent(msg)}`;
-window.open(url,'_blank');
-}
-}
-let n=document.getElementById('buyer').value.trim();
-let p=document.getElementById('phone').value.trim();
-let a=document.getElementById('address').value.trim();
-if(!n||!p||!a){alert('নাম, মোবাইল ও ঠিকানা পূরণ করুন।');return}
-if(!/^01[0-9]{9}$/.test(p)){
-alert('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।');
-return;}
-let delivery=Number(document.getElementById('delivery').value);
-let lines=cart.map(x=>`${x.name} | সাইজ ${x.size} | ${x.qty}টি | ৳${x.price*x.qty}`).join('\n');
-let subtotal=cart.reduce((s,x)=>s+x.price*x.qty,0);
-let total=subtotal+delivery;
-let msg=`DealNexa BD Hoodie Order
-নাম: ${n}
-মোবাইল: ${p}
-ঠিকানা: ${a}
-পেমেন্ট: ${document.getElementById('pay').value}
-\n
-let url = `https://wa.me/8801832763840?text=${encodeURIComponent(msg)}`;
-window.open(url, '_blank');
-${lines}
-পণ্যের দাম: ৳${subtotal}
-ডেলিভারি চার্জ: ৳${delivery}
-সর্বমোট: ৳${total}`;
+window.add = add;
+window.draw = draw;
+window.changeQty = changeQty;
+window.removeItem = removeItem;
 
 function order(){
 if(!cart.length){
@@ -337,7 +332,7 @@ window.removeItem = removeItem;
 window.order = order;
 
 loadProducts();
-
+draw();
 </script>
  <!-- Floating WhatsApp Button -->
 <a href="https://wa.me/8801832763840"
