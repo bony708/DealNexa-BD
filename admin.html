@@ -117,10 +117,10 @@ if(user) loadProducts();
 });
 
 async function loadProducts(){
-$("products").textContent="Loading...";
+if($("products")) $("products").textContent="Loading...";
 try{
 const snap=await getDocs(collection(db,"products"));
-$("products").innerHTML="";
+if($("products")) $("products").innerHTML="";
 snap.forEach(item=>{
 const p=item.data();
 const div=document.createElement("div");
@@ -157,7 +157,7 @@ if($("msg")) $("msg").textContent="Error: "+e.message;
 }
 }
 window.saveProduct=async function(){
- <p id="msg"></p> 
+  
 const user=auth.currentUser;
 if(!user)return;
 const name=$("name").value.trim();
@@ -178,11 +178,11 @@ await updateDoc(doc(db,"products",pid),data);
 }else{
 await addDoc(collection(db,"products"),data);
 }
-$("msg").textContent="Product saved successfully!";
+if($("msg")) $("msg").textContent="Product saved successfully!";
 clearForm();
 await loadProducts();
 }catch(e){
-$("msg").textContent="Error: "+e.message;
+if($("msg")) $("msg").textContent="Error: "+e.message;
 }
 };
 window.editProduct=(id,p)=>{
