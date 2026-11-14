@@ -88,11 +88,8 @@ footer{background:#10213b;color:#dce7f8;padding:24px 0;margin-top:35px}
 <p class="notice">পণ্যের ছবি ও ডিজাইন আপনার দেওয়া ছবির ভিত্তিতে যোগ করা হয়েছে। বিক্রির আগে পণ্যের ব্র্যান্ড/লোগোর সত্যতা ও ব্যবহারের অনুমতি নিশ্চিত করুন।</p>
 </main><footer><div class="wrap"><b>DealNexa BD</b><p>অর্ডার সহায়তা: WhatsApp 01832763840</p><small>© 2026 DealNexa BD</small></div></footer>
 <script>
-const products=[{id:1,name:'Color Splash Hoodie – White & Maroon',price:900,stock:5},
-{id:2,name:'Color Splash Hoodie – Black',price:900,stock:5},
-{id:3,name:'Cute Cat Zip Hoodie – Black',price:900,stock:5},
-{id:4,name:'Cute Cat Zip Hoodie – Maroon',price:900,stock:5},
-{id:5,name:'Love Cat Zip Hoodie – Black',price:900,stock:5}];let cart=[];
+let products=[];
+let cart=[];
 function add(id){const p=products.find(x=>x.id===id);const size=document.getElementById('size'+id).value;const found=cart.find(x=>x.id===id&&x.size===size);if(found){if(found.qty>=5){alert('এই ডিজাইনের সর্বোচ্চ স্টক ৫টি।');return}found.qty++}else cart.push({id:p.id,name:p.name,size,price:p.price,qty:1});draw()}
 function draw(){const el=document.getElementById('cart');if(!cart.length){el.textContent='কার্টে এখনো কোনো পণ্য নেই।';document.getElementById('total').textContent='মোট: ৳০';return}el.innerHTML=cart.map((x,i)=>`<div class="cartline"><span>${x.name} / ${x.size} × ${x.qty}</span><span>৳${x.price*x.qty} <button style="width:auto;margin:0;padding:4px 8px" onclick="removeItem(${i})">×</button></span></div>`).join('');document.getElementById('total').textContent='মোট: ৳'+cart.reduce((s,x)=>s+x.price*x.qty,0)}
 function removeItem(i){cart.splice(i,1);draw()}
@@ -119,8 +116,13 @@ ${lines}
 ডেলিভারি চার্জ: ৳${delivery}
 সর্বমোট: ৳${total}`;
 
-window.open('https://wa.me/8801832763840?text='+encodeURIComponent(msg),'_blank');
+
+window.open(
+  'https://wa.me/8801832763840?text=' + encodeURIComponent(msg),
+  '_blank'
+);
 }
+
 
 draw();
 </script><!-- Floating WhatsApp Button -->
