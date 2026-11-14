@@ -137,9 +137,6 @@ const db = getFirestore(app);
 
 let products=[];
 let cart=[];
-
-
-
 function add(id){const p=products.find(x=>x.id===id);const size=document.getElementById('size'+id).value;const found=cart.find(x=>x.id===id&&x.size===size);if(found){if(found.qty>=5){alert('এই ডিজাইনের সর্বোচ্চ স্টক ৫টি।');return}found.qty++}else cart.push({id:p.id,name:p.name,size,price:p.price,qty:1});draw()}
 function draw(){const el=document.getElementById('cart');if(!cart.length){el.textContent='কার্টে এখনো কোনো পণ্য নেই।';document.getElementById('total').textContent='মোট: ৳০';return}el.innerHTML=cart.map((x,i)=>`<div class="cartline"><span>${x.name} / ${x.size} × ${x.qty}</span><span>৳${x.price*x.qty} <button style="width:auto;margin:0;padding:4px 8px" onclick="removeItem(${i})">×</button></span></div>`).join('');document.getElementById('total').textContent='মোট: ৳'+cart.reduce((s,x)=>s+x.price*x.qty,0)}
 function removeItem(i){cart.splice(i,1);draw()}
@@ -183,7 +180,7 @@ loadProducts();
 draw();
 
 </script>
- !-- Floating WhatsApp Button -->
+ <!-- Floating WhatsApp Button -->
 <a href="https://wa.me/8801832763840"
    target="_blank"
    rel="noopener"
